@@ -1,0 +1,11 @@
+langchain
+llama-index
+faiss-cpu
+chromadb
+sentence-transformers
+rank_bm25
+python-dotenv
+pandas
+numpy
+notebook
+ipykernel

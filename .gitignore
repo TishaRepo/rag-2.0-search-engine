@@ -1,0 +1,61 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+pip-wheel-metadata/
+
+# =========================
+# Virtual Environments
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Jupyter / Notebooks
+# =========================
+.ipynb_checkpoints/
+*.ipynb
+
+# =========================
+# OS / Editor Files
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# =========================
+# Logs & Runtime
+# =========================
+logs/
+*.log
+
+# =========================
+# Model & ML Artifacts
+# =========================
+models/
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.onnx
+
+# =========================
+# Vector Indexes / Databases
+# =========================
+data/indexes/
+faiss_index/
+*.faiss
+*.index*
