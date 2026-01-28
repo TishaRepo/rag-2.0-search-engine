@@ -102,14 +102,24 @@ class DocumentIndexer:
         logger.info(f"Indexing complete: {stats}")
         return stats
     
-    def save_bm25_index(self, path: Path):
-        """Save BM25 index to disk."""
+    def save_bm25_index(self, path: Path, chunks: List = None):
+        """Save BM25 index to disk with document content."""
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         
+        # Build documents dict for retriever compatibility
+        documents = {}
+        if chunks:
+            for chunk in chunks:
+                chunk_id = chunk.chunk_id if hasattr(chunk, 'chunk_id') else chunk.get('chunk_id')
+                content = chunk.content if hasattr(chunk, 'content') else chunk.get('content', '')
+                metadata = chunk.metadata if hasattr(chunk, 'metadata') else chunk.get('metadata', {})
+                documents[chunk_id] = {"content": content, "metadata": metadata}
+        
         data = {
             "corpus": self.bm25_corpus,
-            "chunk_ids": self.bm25_chunk_ids
+            "chunk_ids": self.bm25_chunk_ids,
+            "documents": documents  # Add documents for retriever
         }
         
         with open(path, 'wb') as f:

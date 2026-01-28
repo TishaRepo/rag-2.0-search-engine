@@ -63,8 +63,8 @@ def run_ingestion_pipeline():
     stats = indexer.index_chunks(all_chunks)
     print(f"   ✅ Indexed {stats['indexed']} chunks")
     
-    # Save BM25 index
-    indexer.save_bm25_index(INDICES_DIR / "bm25_index.pkl")
+    # Save BM25 index with document content
+    indexer.save_bm25_index(INDICES_DIR / "bm25_index.pkl", chunks=all_chunks)
     print(f"   ✅ BM25 index saved")
     
     # Step 4: Test Search
@@ -72,7 +72,9 @@ def run_ingestion_pipeline():
     test_queries = [
         "What is artificial intelligence?",
         "How does machine learning work?",
-        "What is RAG?"
+        "What is RAG?",
+        "Where is the PRIMERGY server?",
+        "What is a ML?",
     ]
     
     for query in test_queries:
