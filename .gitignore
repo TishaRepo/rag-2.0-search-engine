@@ -12,9 +12,12 @@ venv/
 ENV/
 .venv/
 pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
 
 # =========================
-# Virtual Environments
+# Virtual Environments & Secrets
 # =========================
 .env
 .env.*
@@ -34,6 +37,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
 
 # =========================
 # Logs & Runtime
@@ -55,7 +60,33 @@ checkpoints/
 # =========================
 # Vector Indexes / Databases
 # =========================
-data/indexes/
+data/indices/
 faiss_index/
 *.faiss
 *.index*
+*.pkl
+
+# =========================
+# Testing
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# =========================
+# Docker & SSL
+# =========================
+ssl/
+*.pem
+*.crt
+*.key
+
+# =========================
+# Output Files
+# =========================
+*_output.txt
+verif_out*.txt
+reranking_output.txt
+
