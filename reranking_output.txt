@@ -1,0 +1,46 @@
+2026-01-08 11:34:54.525429: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-01-08 11:34:58.836899: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING:tensorflow:From C:\Users\tisha_madame\AppData\Local\Programs\Python\Python310\lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+======================================================================
+🚀 Phase 3: Re-Ranking Demo
+======================================================================
+
+⏳ Loading components...
+✅ Components loaded.
+
+🔍 Query: 'Where exactly is the PRIMERGY server located in the building?'
+
+📊 HYBRID RETRIEVAL RESULTS (Phase 2)
+--------------------------------------------------
+[1] Score: 0.609 | hybrid_weighted
+    Content: ================================================================================ ASSET DETAILS REPORT ==================...
+[2] Score: 0.342 | hybrid_weighted
+    Content: Machine learning (ML) is a type of artificial intelligence (AI) that allows software applications to become more accurat...
+[3] Score: 0.266 | hybrid_weighted
+    Content: Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to natural intelligence displayed by a...
+[4] Score: 0.261 | hybrid_weighted
+    Content: A vector database is a type of database that stores data as high-dimensional vectors, which are mathematical representat...
+[5] Score: 0.223 | hybrid_weighted
+    Content: Retrieval-Augmented Generation (RAG) is an AI framework that combines information retrieval with text generation. It enh...
+[6] Score: 0.208 | hybrid_weighted
+    Content: Natural language processing (NLP) is a subfield of linguistics, computer science, and artificial intelligence concerned ...
+
+✨ Applying Reranker...
+
+🏆 RERANKED RESULTS (Phase 3)
+--------------------------------------------------
+[1] Score: -10.582 | hybrid_weighted+rerank
+    Content: ================================================================================ ASSET DETAILS REPORT ==================...
+[2] Score: -11.148 | hybrid_weighted+rerank
+    Content: Machine learning (ML) is a type of artificial intelligence (AI) that allows software applications to become more accurat...
+[3] Score: -11.161 | hybrid_weighted+rerank
+    Content: Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to natural intelligence displayed by a...
+[4] Score: -11.162 | hybrid_weighted+rerank
+    Content: Retrieval-Augmented Generation (RAG) is an AI framework that combines information retrieval with text generation. It enh...
+[5] Score: -11.205 | hybrid_weighted+rerank
+    Content: Natural language processing (NLP) is a subfield of linguistics, computer science, and artificial intelligence concerned ...
+
+======================================================================
+✅ Reranking test complete!
+======================================================================

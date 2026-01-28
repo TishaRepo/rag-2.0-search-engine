@@ -1,0 +1,44 @@
+
+================================================================================
+ASSET DETAILS REPORT
+================================================================================
+Generated: 9/12/2025, 5:35:14 pm
+
+BASIC INFORMATION
+-----------------
+Asset Number:        052018030468
+Product Name:        PRIMERGY TX1310 PYT1313ZG1
+Invoice Number:      To be configured
+Company Name:        honda
+
+LOCATION
+--------
+Building:            High Throughput Building
+Floor:               2F
+Room:                208
+Installation:        High Throughput Building 2F Room 208
+GPS Coordinates:     34.947792, 134.430797
+
+USER INFORMATION
+----------------
+Registered User:     To be configured
+Actual User:         To be configured
+Management Location: To be configured
+Parent Asset ID:     None
+
+STATUS
+------
+Status:              Operational
+Condition:           N/A
+
+ADDITIONAL NOTES
+----------------
+Description:         N/A
+Notes:               W asset
+
+TIMESTAMPS
+----------
+Created:             2025-11-01T01:42:44.36271+00:00
+Last Updated:        2025-12-09T08:35:02.955744+00:00
+
+================================================================================
