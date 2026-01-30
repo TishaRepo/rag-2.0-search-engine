@@ -63,9 +63,9 @@ ENV PYTHONUNBUFFERED=1 \
 # Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+# Health check (Increased start_period to 300s for model loading)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=300s --retries=5 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run the application
-CMD gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+# Run the application (Increased timeout to 300s)
+CMD gunicorn main:app -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 300
