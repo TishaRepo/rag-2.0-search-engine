@@ -15,7 +15,7 @@ pip-wheel-metadata/
 *.egg-info/
 dist/
 build/
-docs/
+
 
 # =========================
 # Virtual Environments & Secrets
@@ -46,6 +46,8 @@ Thumbs.db
 # =========================
 logs/
 *.log
+docs/
+*.md
 
 # =========================
 # Model & ML Artifacts
