@@ -10,6 +10,8 @@ from dataclasses import dataclass
 
 from .bm25_retriever import BM25Retriever, RetrievalResult
 from .vector_retriever import VectorRetriever
+from .pinecone_retriever import PineconeRetriever
+from src.config import VECTOR_STORE_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -73,12 +75,19 @@ class HybridRetriever:
         # Initialize BM25 Retriever
         self.bm25_retriever = BM25Retriever(index_path=bm25_index_path)
         
-        # Initialize Vector Retriever
-        self.vector_retriever = VectorRetriever(
-            embedding_model=embedding_model,
-            chroma_persist_dir=chroma_persist_dir,
-            collection_name=collection_name
-        )
+        # Initialize Vector Retriever based on config
+        if VECTOR_STORE_TYPE == "pinecone":
+            logger.info("Using Pinecone as vector store")
+            self.vector_retriever = PineconeRetriever(
+                embedding_model=embedding_model
+            )
+        else:
+            logger.info("Using ChromaDB as vector store")
+            self.vector_retriever = VectorRetriever(
+                embedding_model=embedding_model,
+                chroma_persist_dir=chroma_persist_dir,
+                collection_name=collection_name
+            )
         
         logger.info(f"Hybrid retriever initialized with α={alpha}")
     

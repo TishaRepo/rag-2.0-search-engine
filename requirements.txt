@@ -20,6 +20,7 @@ torch>=2.1.0
 # Vector Stores
 chromadb>=0.4.22
 faiss-cpu>=1.7.4
+pinecone-client>=3.0.0
 
 # Keyword Search
 rank_bm25>=0.2.2

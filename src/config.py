@@ -93,6 +93,12 @@ LLM_MODELS = {
 CHROMA_COLLECTION_NAME = "ngse_documents"
 CHROMA_PERSIST_DIR = str(INDICES_DIR / "chroma")
 
+# Pinecone settings
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "ngse-search")
+VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma") # or "pinecone"
+
 # =============================================================================
 # VERIFICATION CONFIGURATION
 # =============================================================================

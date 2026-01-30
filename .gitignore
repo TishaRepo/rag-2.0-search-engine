@@ -15,6 +15,7 @@ pip-wheel-metadata/
 *.egg-info/
 dist/
 build/
+docs/
 
 # =========================
 # Virtual Environments & Secrets

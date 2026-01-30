@@ -9,7 +9,7 @@ from pathlib import Path
 
 from src.config import (
     INDICES_DIR, TOP_K_RETRIEVAL, TOP_K_RERANK, 
-    HYBRID_ALPHA, RERANKER_MODEL
+    HYBRID_ALPHA, RERANKER_MODEL, VECTOR_STORE_TYPE
 )
 from src.retrieval import HybridRetriever, Reranker
 from src.reasoning import CoTReasoner, QueryDecomposer, Verifier
@@ -215,8 +215,13 @@ class SearchEngineService:
         
         # Check retriever
         try:
-            count = self.retriever.vector_retriever.collection.count()
-            components["retriever"] = f"healthy ({count} documents)"
+            if VECTOR_STORE_TYPE == "pinecone":
+                # Check Pinecone connection
+                self.retriever.vector_retriever.index.describe_index_stats()
+                components["retriever"] = "healthy (pinecone)"
+            else:
+                count = self.retriever.vector_retriever.collection.count()
+                components["retriever"] = f"healthy (chroma, {count} documents)"
         except Exception as e:
             components["retriever"] = f"unhealthy: {e}"
         
