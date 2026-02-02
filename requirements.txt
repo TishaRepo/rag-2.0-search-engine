@@ -15,7 +15,7 @@ openai>=1.10.0
 # ML & Embeddings
 sentence-transformers>=2.2.2
 transformers>=4.36.0
-torch>=2.1.0
+torch>=2.1.0 --index-url https://download.pytorch.org/whl/cpu
 
 # Vector Stores
 chromadb>=0.4.22

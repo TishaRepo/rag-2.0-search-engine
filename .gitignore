@@ -68,6 +68,9 @@ faiss_index/
 *.faiss
 *.index*
 *.pkl
+data/indices/
+*.sqlite3
+*.db
 
 # =========================
 # Testing

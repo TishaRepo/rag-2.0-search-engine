@@ -30,9 +30,10 @@ FROM python:3.10-slim as runtime
 
 WORKDIR /app
 
-# Install runtime dependencies
+# Install runtime dependencies (libgomp1 is required for torch)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
@@ -56,18 +57,15 @@ USER ngse
 # Environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    ENVIRONMENT=production \
-    PORT=8000 \
-    HOST=0.0.0.0 \
-    PYTHONMALLOC=malloc
+    PORT=7860 \
+    HOST=0.0.0.0
 
 # Expose port
-EXPOSE 8000
+EXPOSE 7860
 
 # Health check (Increased start_period to 300s for model loading)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=300s --retries=5 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:7860/health || exit 1
 
-# Run the application (Increased timeout to 300s)
-# Note: No --preload to keep peak memory lower during startup
-CMD gunicorn main:app -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 300
+# Use --preload and more workers on HF (since 16GB RAM is available)
+CMD gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 300 --preload
