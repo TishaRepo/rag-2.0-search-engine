@@ -200,13 +200,32 @@ async def ingest_documents(request: IngestRequest):
         all_chunks = []
         for doc in request.documents:
             from src.ingestion.document_loader import Document
+            
+            # Extract content
+            content = doc.get("content", doc.get("text", ""))
+            
+            # Prepare metadata (flatten any nested structures)
+            # We skip 'content' and 'text' to avoid redundancy and size limits
+            clean_metadata = {}
+            for k, v in doc.items():
+                if k in ["content", "text"]:
+                    continue
+                if isinstance(v, dict):
+                    # Flatten nested dict: {"metadata": {"source": "wiki"}} -> {"source": "wiki"}
+                    for sub_k, sub_v in v.items():
+                        if not isinstance(sub_v, (dict, list)):
+                            clean_metadata[sub_k] = sub_v
+                elif not isinstance(v, list):
+                    clean_metadata[k] = v
+            
             document = Document(
-                content=doc.get("content", doc.get("text", "")),
-                metadata=doc
+                content=content,
+                metadata=clean_metadata
             )
+            
             chunks = chunker.chunk(
                 document.content,
-                doc_id=document.doc_id,
+                doc_id=doc.get("id") or doc.get("doc_id"),
                 metadata=document.metadata
             )
             all_chunks.extend(chunks)
