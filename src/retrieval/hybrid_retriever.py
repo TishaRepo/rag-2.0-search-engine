@@ -79,7 +79,7 @@ class HybridRetriever:
         if VECTOR_STORE_TYPE == "pinecone":
             logger.info("Using Pinecone as vector store")
             self.vector_retriever = PineconeRetriever(
-                embedding_model=embedding_model
+                model_name=embedding_model
             )
         else:
             logger.info("Using ChromaDB as vector store")
