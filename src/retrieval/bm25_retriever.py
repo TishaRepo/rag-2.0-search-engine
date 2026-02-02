@@ -184,10 +184,15 @@ class BM25Retriever:
         path = Path(path)
         
         if not path.exists():
-            raise FileNotFoundError(f"BM25 index not found: {path}")
+            logger.warning(f"⚠️ BM25 index not found at {path}. Knowledge base will be empty until data is ingested.")
+            return
         
-        with open(path, 'rb') as f:
-            data = pickle.load(f)
+        try:
+            with open(path, 'rb') as f:
+                data = pickle.load(f)
+        except Exception as e:
+            logger.error(f"❌ Failed to load BM25 index: {e}")
+            return
         
         self.corpus = data.get("corpus", [])
         self.chunk_ids = data.get("chunk_ids", [])
