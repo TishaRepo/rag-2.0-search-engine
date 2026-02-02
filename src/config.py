@@ -71,12 +71,12 @@ RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 # =============================================================================
 
 # LLM Provider: "openai", "groq", "anthropic"
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").strip()
 
 # API Keys (from environment)
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip() or None
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip() or None
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip() or None
 
 # Model names per provider
 LLM_MODELS = {
@@ -94,10 +94,10 @@ CHROMA_COLLECTION_NAME = "ngse_documents"
 CHROMA_PERSIST_DIR = str(INDICES_DIR / "chroma")
 
 # Pinecone settings
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter")
-PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "ngse-search")
-VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma") # or "pinecone"
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "").strip() or None
+PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter").strip()
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "ngse-search").strip()
+VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma").strip().lower() # or "pinecone"
 
 # =============================================================================
 # VERIFICATION CONFIGURATION
