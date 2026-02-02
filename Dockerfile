@@ -58,7 +58,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     ENVIRONMENT=production \
     PORT=8000 \
-    HOST=0.0.0.0
+    HOST=0.0.0.0 \
+    PYTHONMALLOC=malloc
 
 # Expose port
 EXPOSE 8000
@@ -68,4 +69,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=300s --retries=5 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Run the application (Increased timeout to 300s)
+# Note: No --preload to keep peak memory lower during startup
 CMD gunicorn main:app -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 300
