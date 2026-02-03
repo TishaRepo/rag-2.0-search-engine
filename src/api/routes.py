@@ -15,6 +15,7 @@ from src.api.models import (
     SearchRequest, SearchResponse, RetrievedDocument,
     ReasoningResult, VerificationResult,
     IngestRequest, IngestResponse,
+    DeleteRequest, DeleteResponse,
     HealthResponse, ErrorResponse,
     QueryDecomposeRequest, QueryDecomposeResponse
 )
@@ -188,66 +189,43 @@ async def ingest_documents(request: IngestRequest):
     start_time = time.time()
     
     try:
-        from src.ingestion import DocumentLoader, SemanticChunker, DocumentIndexer
-        from src.config import INDICES_DIR
-        
-        # Create chunks
-        chunker = SemanticChunker(
-            chunk_size=request.chunk_size,
-            chunk_overlap=request.chunk_overlap
-        )
-        
-        all_chunks = []
-        for doc in request.documents:
-            from src.ingestion.document_loader import Document
-            
-            # Extract content
-            content = doc.get("content", doc.get("text", ""))
-            
-            # Prepare metadata (flatten any nested structures)
-            # We skip 'content' and 'text' to avoid redundancy and size limits
-            clean_metadata = {}
-            for k, v in doc.items():
-                if k in ["content", "text"]:
-                    continue
-                if isinstance(v, dict):
-                    # Flatten nested dict: {"metadata": {"source": "wiki"}} -> {"source": "wiki"}
-                    for sub_k, sub_v in v.items():
-                        if not isinstance(sub_v, (dict, list)):
-                            clean_metadata[sub_k] = sub_v
-                elif not isinstance(v, list):
-                    clean_metadata[k] = v
-            
-            document = Document(
-                content=content,
-                metadata=clean_metadata
-            )
-            
-            chunks = chunker.chunk(
-                document.content,
-                doc_id=doc.get("id") or doc.get("doc_id"),
-                metadata=document.metadata
-            )
-            all_chunks.extend(chunks)
-        
-        # Index chunks
-        indexer = DocumentIndexer(
-            chroma_persist_dir=str(INDICES_DIR / "chroma"),
-            collection_name="ngse_documents"
-        )
-        stats = indexer.index_chunks(all_chunks)
-        indexer.save_bm25_index(INDICES_DIR / "bm25_index.pkl", chunks=all_chunks)
+        service = get_search_service()
+        stats = service.ingest_documents(request.documents)
         
         return IngestResponse(
             status="success",
-            documents_processed=len(request.documents),
-            chunks_created=len(all_chunks),
-            chunks_indexed=stats.get("indexed", 0),
+            documents_processed=stats.get("documents_processed", 0),
+            chunks_created=stats.get("chunks_created", 0),
+            chunks_indexed=stats.get("vector_count", 0),
             processing_time_ms=(time.time() - start_time) * 1000
         )
-        
     except Exception as e:
         logger.error(f"Ingestion failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/documents", response_model=DeleteResponse, tags=["Data Management"])
+async def delete_documents(request: DeleteRequest):
+    """
+    Delete documents from the search index.
+    """
+    try:
+        service = get_search_service()
+        result = service.delete_documents(
+            ids=request.ids,
+            filter=request.filter,
+            delete_all=request.delete_all
+        )
+        
+        deleted_count = result.get("vector_deleted", 0)
+        
+        return DeleteResponse(
+            status="success",
+            deleted_count=deleted_count,
+            message=f"Deleted {deleted_count} docs from vector store and updated BM25."
+        )
+    except Exception as e:
+        logger.error(f"Deletion failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

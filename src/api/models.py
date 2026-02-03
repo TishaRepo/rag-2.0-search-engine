@@ -60,6 +60,13 @@ class QueryDecomposeRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=1000)
 
 
+class DeleteRequest(BaseModel):
+    """Document deletion request."""
+    ids: Optional[List[str]] = Field(None, description="List of document IDs to delete")
+    filter: Optional[Dict[str, Any]] = Field(None, description="Metadata filter for deletion")
+    delete_all: bool = Field(default=False, description="Whether to clear the entire index")
+
+
 # =============================================================================
 # RESPONSE MODELS
 # =============================================================================
@@ -135,6 +142,13 @@ class QueryDecomposeResponse(BaseModel):
     """Query decomposition response."""
     original_query: str
     sub_queries: List[str]
+
+
+class DeleteResponse(BaseModel):
+    """Document deletion response."""
+    status: str
+    deleted_count: int
+    message: str
 
 
 class ErrorResponse(BaseModel):

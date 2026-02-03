@@ -344,6 +344,57 @@ class HybridRetriever:
         
         return results
 
+    def delete(
+        self,
+        ids: Optional[List[str]] = None,
+        filter: Optional[Dict] = None,
+        delete_all: bool = False
+    ) -> Dict[str, int]:
+        """
+        Delete documents from both BM25 and Vector store.
+        """
+        from src.config import INDICES_DIR
+        
+        bm25_deleted = self.bm25_retriever.delete(
+            ids=ids,
+            delete_all=delete_all,
+            save_path=INDICES_DIR / "bm25_index.pkl"
+        )
+        
+        vector_deleted = self.vector_retriever.delete(
+            ids=ids,
+            filter=filter,
+            delete_all=delete_all
+        )
+        
+        return {
+            "bm25_deleted": bm25_deleted,
+            "vector_deleted": vector_deleted
+        }
+
+    def add_documents(self, chunks: List[Dict]) -> Dict[str, int]:
+        """
+        Add documents to both BM25 and Vector store.
+        """
+        from src.config import INDICES_DIR
+        
+        # Add to BM25 and save
+        bm25_count = self.bm25_retriever.add_documents(
+            chunks=chunks,
+            save_path=INDICES_DIR / "bm25_index.pkl"
+        )
+        
+        # Add to Vector Store
+        vector_count = self.vector_retriever.add_documents(
+            chunks=chunks
+        )
+        
+        return {
+            "bm25_count": bm25_count,
+            "vector_count": vector_count
+        }
+
+
 
 if __name__ == "__main__":
     # Test Hybrid Retriever
@@ -379,10 +430,3 @@ if __name__ == "__main__":
             print(f"    BM25: {r.bm25_score:.3f} | Vector: {r.vector_score:.3f}")
             print(f"    Content: {r.content[:80]}...")
     
-    # Compare methods for one query
-    print("\n" + "="*60)
-    print("📊 Method Comparison")
-    print("="*60)
-    
-    comparison = retriever.compare_methods("machine learning algorithms", top_k=3)
-    print(json.dumps(comparison, indent=2, default=str)[:1000] + "...")

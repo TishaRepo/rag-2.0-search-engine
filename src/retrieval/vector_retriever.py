@@ -238,3 +238,34 @@ if __name__ == "__main__":
     for t1, t2 in pairs:
         sim = retriever.similarity(t1, t2)
         print(f"  '{t1}' ↔ '{t2}': {sim:.3f}")
+    def delete(
+        self,
+        ids: Optional[List[str]] = None,
+        where: Optional[Dict] = None,
+        delete_all: bool = False
+    ) -> int:
+        """
+        Delete documents from ChromaDB.
+        """
+        if delete_all:
+            count = self.collection.count()
+            self.chroma_client.delete_collection(self.collection_name)
+            self.collection = self.chroma_client.get_or_create_collection(
+                name=self.collection_name,
+                metadata={"hnsw:space": "cosine"}
+            )
+            logger.info(f"Cleared ChromaDB collection ({count} docs)")
+            return count
+            
+        if ids:
+            self.collection.delete(ids=ids)
+            logger.info(f"Deleted {len(ids)} docs from ChromaDB by ID")
+            return len(ids)
+            
+        if where:
+            # Note: ChromaDB delete doesn't return count directly
+            self.collection.delete(where=where)
+            logger.info(f"Deleted docs from ChromaDB using where filter: {where}")
+            return 1
+            
+        return 0

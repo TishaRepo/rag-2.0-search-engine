@@ -102,6 +102,93 @@ class BM25Retriever:
             self.save_index(save_path)
         
         logger.info(f"BM25 index built with {len(self.corpus)} documents")
+
+    def add_documents(
+        self,
+        chunks: List[Dict],
+        save_path: Optional[Path] = None
+    ) -> int:
+        """
+        Add new documents to the existing BM25 index.
+        """
+        if not chunks:
+            return 0
+            
+        logger.info(f"Adding {len(chunks)} chunks to BM25 index...")
+        
+        for chunk in chunks:
+            chunk_id = chunk.get("chunk_id", chunk.get("id"))
+            content = chunk.get("content", chunk.get("text", ""))
+            metadata = chunk.get("metadata", {})
+            
+            # Skip if already exists
+            if chunk_id in self.documents:
+                continue
+                
+            tokens = self._tokenize(content)
+            self.corpus.append(tokens)
+            self.chunk_ids.append(chunk_id)
+            self.documents[chunk_id] = {
+                "content": content,
+                "metadata": metadata
+            }
+            
+        # Re-build BM25 index with expanded corpus
+        self.bm25_index = BM25Okapi(self.corpus)
+        
+        if save_path:
+            self.save_index(save_path)
+            
+        return len(chunks)
+
+    def delete(
+        self,
+        ids: Optional[List[str]] = None,
+        delete_all: bool = False,
+        save_path: Optional[Path] = None
+    ) -> int:
+        """
+        Delete documents from the BM25 index.
+        """
+        if delete_all:
+            count = len(self.documents)
+            self.corpus = []
+            self.chunk_ids = []
+            self.documents = {}
+            self.bm25 = None
+            logger.info(f"Cleared BM25 index ({count} docs)")
+            if save_path:
+                self.save_index(save_path)
+            return count
+            
+        if not ids:
+            return 0
+            
+        initial_count = len(self.documents)
+        
+        # Filter out the items to delete
+        new_docs = {k: v for k, v in self.documents.items() if k not in ids}
+        
+        if len(new_docs) == initial_count:
+            return 0
+            
+        # Rebuild internal lists
+        self.documents = new_docs
+        self.chunk_ids = list(self.documents.keys())
+        self.corpus = list(self.documents.values())
+        
+        # Re-initialize BM25 model with new corpus
+        from rank_bm25 import BM25Okapi
+        tokenized_corpus = [doc.split() for doc in self.corpus]
+        self.bm25 = BM25Okapi(tokenized_corpus) if tokenized_corpus else None
+        
+        deleted = initial_count - len(self.documents)
+        logger.info(f"Deleted {deleted} docs from BM25 index")
+        
+        if save_path:
+            self.save_index(save_path)
+            
+        return deleted
     
     def _tokenize(self, text: str) -> List[str]:
         """Simple tokenization: lowercase and split on whitespace."""
@@ -245,9 +332,3 @@ if __name__ == "__main__":
         "PRIMERGY server location"
     ]
     
-    for query in queries:
-        print(f"\n🔍 Query: '{query}'")
-        results = retriever.retrieve(query, top_k=3)
-        for i, r in enumerate(results, 1):
-            print(f"  [{i}] Score: {r.score:.3f}")
-            print(f"      {r.content[:80]}...")

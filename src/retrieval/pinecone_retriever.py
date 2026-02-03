@@ -128,3 +128,34 @@ class PineconeRetriever:
             ))
             
         return retrieval_results
+    def delete(
+        self,
+        ids: Optional[List[str]] = None,
+        filter: Optional[Dict] = None,
+        delete_all: bool = False
+    ) -> int:
+        """
+        Delete documents from Pinecone.
+        Returns the number of deleted documents (estimated if delete_all).
+        """
+        if delete_all:
+            stats = self.index.describe_index_stats()
+            total_count = stats.get('total_vector_count', 0)
+            self.index.delete(delete_all=True)
+            logger.info(f"Deleted all {total_count} documents from Pinecone")
+            return total_count
+        
+        if ids:
+            self.index.delete(ids=ids)
+            logger.info(f"Deleted {len(ids)} documents from Pinecone by ID")
+            return len(ids)
+            
+        if filter:
+            # Note: Pinecone delete by filter is only supported on certain index types
+            # or requires fetching IDs first if not using a pod-based index.
+            # For Serverless, we can pass the filter directly.
+            self.index.delete(filter=filter)
+            logger.info(f"Deleted documents from Pinecone using filter: {filter}")
+            return 1 # Count is unknown for filters in Serverless
+            
+        return 0

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +46,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
@@ -204,12 +205,12 @@
             transition: all 0.2s ease;
         }
 
-        .toggle input:checked + .toggle-slider {
+        .toggle input:checked+.toggle-slider {
             transform: translateX(20px);
             background: var(--accent-primary);
         }
 
-        .toggle input:checked ~ .toggle {
+        .toggle input:checked~.toggle {
             background: var(--accent-glow);
         }
 
@@ -239,7 +240,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Answer Card */
@@ -257,6 +260,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -336,9 +340,17 @@
             animation-fill-mode: both;
         }
 
-        .source-card:nth-child(2) { animation-delay: 0.1s; }
-        .source-card:nth-child(3) { animation-delay: 0.2s; }
-        .source-card:nth-child(4) { animation-delay: 0.3s; }
+        .source-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .source-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .source-card:nth-child(4) {
+            animation-delay: 0.3s;
+        }
 
         .source-card:hover {
             border-color: var(--accent-primary);
@@ -459,11 +471,47 @@
                 gap: 1rem;
             }
         }
+
+        /* Admin/Management Styles */
+        .admin-panel {
+            background: rgba(18, 18, 26, 0.5);
+            border-style: dashed;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .admin-header:hover {
+            color: var(--accent-secondary);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .ingest-form {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
+
 <body>
     <div class="bg-gradient"></div>
-    
+
     <div class="container">
         <header>
             <h1 class="logo">NGSE</h1>
@@ -472,13 +520,8 @@
 
         <div class="search-container">
             <div class="search-input-wrapper">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="searchInput" 
-                    placeholder="Ask anything... (e.g., What is machine learning?)"
-                    autofocus
-                >
+                <input type="text" class="search-input" id="searchInput"
+                    placeholder="Ask anything... (e.g., What is machine learning?)" autofocus>
                 <button class="search-btn" id="searchBtn" onclick="search()">
                     🔍 Search
                 </button>
@@ -504,6 +547,42 @@
                         <span class="toggle-slider"></span>
                     </label>
                     <label for="useVerification">Verify Facts</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Knowledge Management -->
+        <div class="search-container admin-panel">
+            <div class="admin-header" onclick="toggleAdmin()">
+                <span style="font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    🛠️ Knowledge Management
+                </span>
+                <span id="adminArrow" style="transition: transform 0.3s; font-size: 0.8rem;">▼</span>
+            </div>
+
+            <div id="adminContent" style="display: none; margin-top: 1.5rem; animation: slideIn 0.3s ease;">
+                <div class="status-bar" id="statusBar">
+                    <span>Checking index status...</span>
+                </div>
+
+                <div class="ingest-form">
+                    <input type="text" id="ingestTitle" placeholder="Document Title (optional)" class="search-input"
+                        style="margin-bottom: 0.75rem;">
+                    <textarea id="ingestContent"
+                        placeholder="Paste knowledge content here... The AI will use this to answer future questions."
+                        class="search-input"
+                        style="min-height: 120px; margin-bottom: 1rem; resize: vertical;"></textarea>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="search-btn" onclick="ingestOne()" id="ingestBtn"
+                            style="flex: 2; background: var(--success);">
+                            📥 Add to Knowledge
+                        </button>
+                        <button class="search-btn" onclick="wipeDB()" id="wipeBtn"
+                            style="flex: 1; background: var(--error); padding: 1rem;">
+                            🗑️ Reset System
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -595,8 +674,8 @@
                         <div class="answer-meta">
                             <span>⏱️ ${data.processing_time_ms.toFixed(0)}ms</span>
                             <span>📚 ${data.retrieved_documents?.length || 0} sources</span>
-                            ${data.reasoning?.reasoning_steps?.length ? 
-                                `<span>🧠 ${data.reasoning.reasoning_steps.length} reasoning steps</span>` : ''}
+                            ${data.reasoning?.reasoning_steps?.length ?
+                        `<span>🧠 ${data.reasoning.reasoning_steps.length} reasoning steps</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -656,6 +735,109 @@
             div.textContent = text;
             return div.innerHTML;
         }
+
+        // --- Knowledge Management Functions ---
+
+        function toggleAdmin() {
+            const content = document.getElementById('adminContent');
+            const arrow = document.getElementById('adminArrow');
+            const isHidden = content.style.display === 'none';
+
+            content.style.display = isHidden ? 'block' : 'none';
+            arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+
+            if (isHidden) updateStats();
+        }
+
+        async function updateStats() {
+            const statusBar = document.getElementById('statusBar');
+            try {
+                const response = await fetch('/stats');
+                const data = await response.json();
+                statusBar.innerHTML = `
+                    <span>📊 <b>${data.vector_documents}</b> Chunks in Vector DB</span>
+                    <span>🏷️ <b>${data.bm25_documents}</b> Keywords Indexed</span>
+                `;
+            } catch (e) {
+                statusBar.innerHTML = '<span>⚠️ Could not load stats</span>';
+            }
+        }
+
+        async function ingestOne() {
+            const title = document.getElementById('ingestTitle').value.trim();
+            const content = document.getElementById('ingestContent').value.trim();
+            const btn = document.getElementById('ingestBtn');
+
+            if (!content) {
+                alert('Please provide some content!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Loading...';
+
+            try {
+                const response = await fetch('/ingest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        documents: [{
+                            title: title || "Manual Upload",
+                            content: content
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('ingestTitle').value = '';
+                    document.getElementById('ingestContent').value = '';
+                    alert(`✅ Document successfully added and broken into ${data.chunks_created} chunks!`);
+                    updateStats();
+                } else {
+                    throw new Error('Ingestion failed');
+                }
+            } catch (e) {
+                alert(`Error: ${e.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '📥 Add to Knowledge';
+            }
+        }
+
+        async function wipeDB() {
+            if (!confirm('🚨 Are you sure? This will delete ALL documents from the search engine. This cannot be undone.')) {
+                return;
+            }
+
+            const btn = document.getElementById('wipeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Wiping...';
+
+            try {
+                const response = await fetch('/documents', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ delete_all: true })
+                });
+
+                if (response.ok) {
+                    alert('✨ Knowledge base cleared! The system is now empty.');
+                    updateStats();
+                } else {
+                    throw new Error('Reset failed');
+                }
+            } catch (e) {
+                alert(`Error: ${e.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🗑️ Reset System';
+            }
+        }
+
+        // Initialize stats on load
+        updateStats();
     </script>
 </body>
+
 </html>

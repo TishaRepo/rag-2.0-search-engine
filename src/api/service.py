@@ -241,6 +241,80 @@ class SearchEngineService:
         
         return components
 
+    def delete_documents(
+        self,
+        ids: Optional[List[str]] = None,
+        filter: Optional[Dict] = None,
+        delete_all: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Delete documents from all indices.
+        """
+        try:
+            results = self.retriever.delete(
+                ids=ids,
+                filter=filter,
+                delete_all=delete_all
+            )
+            return results
+        except Exception as e:
+            logger.error(f"Deletion failed: {e}")
+            raise
+
+    def ingest_documents(self, documents: List[Dict]) -> Dict[str, Any]:
+        """
+        Ingest a list of documents into the search engine.
+        
+        Args:
+            documents: List of dicts with 'content' and optional 'metadata'
+            
+        Returns:
+            Stats about ingestion
+        """
+        from src.ingestion import SemanticChunker
+        import uuid
+        
+        chunker = SemanticChunker()
+        all_chunks = []
+        
+        for doc in documents:
+            # Extract content
+            content = doc.get("content", doc.get("text", ""))
+            doc_id = str(doc.get("id", doc.get("doc_id", uuid.uuid4())))
+            
+            # Prepare metadata (flatten any nested structures)
+            clean_metadata = {}
+            for k, v in doc.items():
+                if k in ["content", "text"]:
+                    continue
+                if isinstance(v, dict):
+                    for sub_k, sub_v in v.items():
+                        if not isinstance(sub_v, (dict, list)):
+                            clean_metadata[sub_k] = sub_v
+                elif not isinstance(v, list):
+                    clean_metadata[k] = v
+            
+            # Create chunks
+            chunks = chunker.chunk(content, doc_id=doc_id, metadata=clean_metadata)
+            
+            # Convert Chunks objects to dicts for retrievers
+            for chunk in chunks:
+                all_chunks.append({
+                    "chunk_id": chunk.chunk_id,
+                    "content": chunk.content,
+                    "metadata": chunk.metadata
+                })
+        
+        # Add to indices
+        results = self.retriever.add_documents(all_chunks)
+        
+        return {
+            "documents_processed": len(documents),
+            "chunks_created": len(all_chunks),
+            "vector_count": results.get("vector_count", 0),
+            "bm25_count": results.get("bm25_count", 0)
+        }
+
 
 # Singleton instance
 _service_instance: Optional[SearchEngineService] = None
